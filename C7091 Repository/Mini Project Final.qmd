@@ -1,0 +1,154 @@
+---
+title: "Mini Project"
+format: html
+editor: visual
+---
+
+## Mini Project:
+
+Introduction
+
+This Mini Project will analyse whether different methods of soil treatment produce different yields. A new method was recently developed that uses nanotechnology to 'enhance' biological nitrogen fixation. There are two other methods to compare this to, BNF Inoculant and Control. BNF Inoculant is the current method of applying microorganisms to soil to improve productivity and crop health. The supposed control method is not managing the soil and not changing the process at all. We therefore have three methods to perform statistical tests on, to see which method is best and provides highest yield, but to also see if there is any significant difference between each method, and if nanotechnology is worth using. Make sure that when viewing the figures, to expand the drop-down to see the results of the code.
+
+Abstract
+
+In this portion of the mini-project I will go over current beliefs by the creators of the nanotechnology, and will state the null-hypotheses of these beliefs that I will refer back to in the Results and Discussion sections of this project, these aspects will proven using ANOVA tests.
+
+Hypotheses:
+
+1.  Nanotechnology BNF will outperform and provide greater yield than BNF Inoculant.
+
+2.  In both 2016 and 2017, Nanotechnology will outperform both BNF Inoculant and Control.
+
+3.  Nanotechnology BNF yield will improve from 2016 to 2017.
+
+4.  BNF Inoculant will outperform Control due to poor nitrogen fixing bacteria in soil.
+
+Null hypotheses:
+
+H01 - There will be no significant increase in yield when using Nanotechnology over BNF Inoculant
+
+H02 - Nanotechnology will not outperform BNF Inoculant or Control in 2016 or 2017.
+
+H03 - Yield from Nanotechnology will not provide a significant increase in yield from 2016 to 2017.
+
+H04 - No significant yield difference between BNF Inoculant and Control.
+
+Methodology:
+
+-   Load tidy Data in to RStudio.
+
+-   Perform ANOVA statistical test on the data. To see if there is a significant variance in results.
+
+```{r}
+## Load in tidyverse package and load the data I need for soil and Yield
+library(tidyverse)
+data <- read.csv("C:\\Users\\axelr\\Desktop\\C7091 - Lectures\\data.csv")
+view(data)
+
+#Boxplot for visualisation
+ggplot(data, aes(x = soil, y = Yield)) +
+  geom_boxplot()
+#Variance
+data %>%
+  group_by(soil) %>%
+  summarise(var(Yield, na.rm = TRUE))
+
+#ANOVA Test
+model <- aov(Yield ~ soil, data = data)
+summary(model)
+
+#Post-Hoc, TukeyHSD Test
+TukeyHSD(model)
+
+```
+
+Figure 1: Box plot highlighting the 3 soil variables vs Yield.
+
+```{r}
+model <- aov(Yield ~ soil, data = data)
+summary(model)
+
+```
+
+Figure 2: AOV results for difference in yield.
+
+```{r}
+TukeyHSD(model)
+
+```
+
+Figure 3: TukeyHSD post-hoc test
+
+```{r}
+nanotechnology <- subset(data, soil == "nanotechnology")
+
+nanotechnology$yr <- as.factor(nanotechnology$yr)
+
+aggregate(Yield ~ yr, data = nanotechnology, FUN = mean)
+
+```
+
+Figure 4: Average Yield for Nanotechnology in 2016 and 2017.
+
+```{r}
+bacterial_inoculant <- subset(data, soil == "bacterial_inoculant")
+
+bacterial_inoculant$yr <- as.factor(bacterial_inoculant$yr)
+
+aggregate(Yield ~ yr,data = bacterial_inoculant, FUN = mean)
+
+```
+
+Figure 5: Average Yield for Bacterial Inoculant in 2016 and 2017
+
+```{r}
+control <- subset(data, soil == "control")
+
+control$yr <- as.factor(control$yr)
+
+aggregate(Yield ~ yr,data = control, FUN = mean)
+
+```
+
+Figure 6: Average Yield for Control in 2016 and 2017
+
+```{r}
+#Variance
+data %>%
+  group_by(soil) %>%
+  summarise(var(Yield, na.rm = TRUE))
+
+```
+
+Figure 7: Variance results for different soil types
+
+Discussion
+
+After loading in the data, I created a boxplot to visualise the different soil types and yield. Figure 1, provides a basic but clear understanding of the data set. On face value, the Nanotechnology has a higher yield than the Bacterial Inoculant and Control. While, the Bacterial Inoculant and Control have very similar yield, with practically identical means. This is an interesting start, however it does not show if the differences are statistically significant.
+
+Next, I performed the Anova test, using the aov() function. This is the function that is used to test if the differences in yield are statistically significant. Figure 2, shows the results of the Anova test. This shows that there is a very significant difference in the results at 0.00000000493, which clearly meets the significance p value of 0.05. This value shows that there is a significant difference between Yield and Soil type, however, it does not provide the intricate detail of the difference between soil types.
+
+I wanted to show the significance of each soil type, to do this, I performed a post-hoc, TukeyHSD test. This shows each soil type against one another. Figure 3 shows the results of the TukeyHSD test. There is no significant difference between the Control and BNF Inoculant, with an insignificant 0.908 p value. With this data, we can accept the null hypothesis, that states: H04 - No significant yiled difference between BNF Inoculant and Control. This clearly disproves the original hypothesis that states: BNF Inoculant will outperform Control due to poor nitrogen fixing bacteria in soil. We can say with confidence that there is not enough of a difference in the data to say that one outperforms the other.
+
+Figure 3 also proves that Nanotechnology is very different to the BNF Inoculant with a very significant p- value of 0.0000001. It also proves that Nanotechnology is very different to the Control with a very significant p-value of 0.0000007. To conclude the fact that Nanotechnology outperforms the other techniques, I found the average Yield of each Soil type across both years. This can be seen in figures 4, 5 and 6. Where I took subsets of each soil type and showed, yield for both 2016 and 2017. Figure 4 shows that Yield for Nanotechnology is highest for both years, at 70.2 in 2016 and 48.1 in 2017. Compared to figure 5 and 6, where Yield for Inoculant at 56.07 (2016) and 32.96(2017) and Yield for Control at 59.5 (2016) and 31.5 (2017) are much lower. With this information we can prove or disprove the rest of the hypotheses.
+
+We are able to reject the null hypothesis H01, which states: There will be no significant increase in yield when using Nanotechnology BNF over BNF Inoculant. We can say with confidence that Nanotechnology increases yield when used over the other two methods.
+
+We can also reject the null hypothesis H02, which states: Nanotechnology will not outperform BNF Inoculant or Control in 2016 or 2017. As Nanotechnology did outperform both methods in 2016 and 2017.
+
+We must accept the null hypothesis H03, which states: Yield from Nanotechnology will not provide a significant increase in yield from 2016 to 2017. The yield for nanotechnology dropped a significant amount, from an average of 70.2 to 48.1, a 45.9% drop.
+
+We can accept the null hypothesis H04, which states: No significant yield difference between BNF Inoculant and Control. This is because the difference in values in 2016 and 2017 does not change a great deal. Going back to the TukeyHSD we can see that there is a tiny difference in yield, with a p value of 0.908. Figure 5 and 6 highlights this, yield for both the Inoculant and control are almost identical for both years and follow the same trend. Highlighting that the nitrogen fixing bacteria in soil has minimal impact on yield.
+
+To critically review the results I collected, for next time I could have used the results from the variance test (see figure 7) which showed that Nanotechnology had a variance of 835, much greater than the BNF Inoculant at 487, and slightly higher than the control at 735. To check if this had an impact on the standard Anova test I would need to perform a Levene test which shows if the variance has a significant impact on the data, and then perform Welch's Anova test which takes into account the variance of the data (Moder 2007).
+
+\
+Conclusion
+
+Nanotechnology contributes to higher net BNF in the soil and a higher yield in crops. The tests against the no-treatment control and regular BNF Inoculant showed that Nanotechnology is a superior method and will improve yield to a greater extent. Regular BNF Inoculant and the untreated Control techniques showed a very small difference in yield, which exhibits that mono-cropping with cereals has not had a profound effect on nitrogen fixing bacteria in the soil.
+
+References
+
+Moder, K. (2007). How to keep the Type I Error Rate in ANOVA if Variances are\
+Heteroscedastic. Austrian Journal of Statistics, 36(3), 179-188.
